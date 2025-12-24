@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kids Phonics Adventure</title>
+    <style>
+        :root { --primary: #FF5722; --secondary: #2196F3; --success: #4CAF50; --bg: #FFF9C4; }
+        body { font-family: 'Comic Sans MS', sans-serif; text-align: center; background-color: var(--bg); margin: 0; padding: 20px; }
+        .container { background: white; max-width: 600px; margin: auto; padding: 20px; border-radius: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); min-height: 80vh; }
+        
+        /* 字母選單 */
+        .alphabet-menu { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 20px; }
+        .letter-btn { background: white; border: 2px solid var(--secondary); border-radius: 8px; padding: 10px; cursor: pointer; font-size: 18px; width: 40px; }
+        .letter-btn:hover { background: var(--secondary); color: white; }
+        .letter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* 遊戲區域 */
+        #play-btn { background: var(--primary); color: white; border: none; padding: 15px 30px; font-size: 24px; border-radius: 50px; cursor: pointer; margin: 15px 0; box-shadow: 0 4px #E64A19; }
+        .choice-container { display: flex; justify-content: space-around; gap: 10px; margin-top: 20px; }
+        .word-option { background: #E3F2FD; border: 3px solid #64B5F6; padding: 20px; font-size: 24px; border-radius: 15px; cursor: pointer; width: 45%; font-weight: bold; }
+        
+        #big-word { font-size: 60px; color: var(--success); display: none; margin: 20px 0; animation: bounce 0.5s infinite alternate; }
+        #star { font-size: 80px; display: none; }
+        @keyframes bounce { from { transform: scale(1); } to { transform: scale(1.1); } }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 id="title">Choose a Letter!</h2>
+    <div id="menu" class="alphabet-menu"></div>
+
+    <div id="game-zone" class="hidden">
+        <button onclick="backToMenu()" style="border:none; background:none; color:gray; cursor:pointer;">⬅ Change Letter</button>
+        <h3 id="step-hint">Step 1: Listen!</h3>
+        <button id="play-btn" onclick="playSound()">🔊 Listen to the Word</button>
+
+        <div id="quiz-area">
+            <div class="choice-container">
+                <div id="opt1" class="word-option" onclick="checkAnswer(this)"></div>
+                <div id="opt2" class="word-option" onclick="checkAnswer(this)"></div>
+            </div>
+        </div>
+
+        <div id="result-area">
+            <div id="star">🌟</div>
+            <div id="big-word"></div>
+            <p id="repeat-hint" style="font-size: 18px; color: #666; display:none;">Now you say it! 🗣️</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const phonicsData = {
+        A: ["ant", "alligator", "arrow", "apple", "ax"],
+        B: ["bee", "bear", "boy", "bike", "bus", "boat", "bird"],
+        C: ["cat", "cap", "cup", "cake", "cow", "computer", "camera", "caterpillar"],
+        D: ["dog", "door", "duck", "deer", "donkey", "dinosaur"],
+        E: ["egg", "elf", "eggplant", "elephant", "elk"],
+        F: ["fish", "fan", "five", "frog", "fox", "fruit"],
+        G: ["goat", "girl", "goose", "gift", "gum", "gorilla"],
+        H: ["hat", "horse", "hen", "house", "happy", "hand", "hippo", "hut"],
+        I: ["ink", "in", "igloo", "iguana", "insect", "indian"],
+        J: ["jam", "juice", "jeep", "jet", "jungle", "jellyfish"],
+        K: ["kite", "key", "kit", "king", "kangaroo", "koala"],
+        L: ["lion", "lamp", "leaf", "lake", "love", "line", "ladybug", "lemon"],
+        M: ["mouse", "monkey", "moon", "milk", "mitten", "map"],
+        N: ["nut", "net", "nose", "nurse", "number", "nest", "nine"],
+        O: ["ox", "olive", "on", "octopus", "otter", "ostrich"],
+        P: ["pig", "pen", "pan", "papaya", "penguin", "peas", "piano", "pizza", "puppy"],
+        Q: ["queen", "quilt", "quick", "quiet", "quarter", "quiz"],
+        R: ["run", "rock", "rabbit", "robot", "rose", "rat", "red", "room"],
+        S: ["sun", "socks", "soup", "snail", "star", "snake", "sea", "sandwich"],
+        T: ["tiger", "top", "turtle", "ten", "train", "taxi", "tomato", "tent"],
+        U: ["up", "under", "uncle", "umbrella", "underwear"],
+        V: ["vase", "van", "vet", "vest", "volcano", "violin"],
+        W: ["witch", "window", "water", "watermelon", "wolf", "watch", "well", "wagon"],
+        X: ["box", "fox", "mix", "six", "T-rex"],
+        Y: ["yolk", "yo-yo", "yes", "yawn", "yellow", "yogurt", "yarn"],
+        Z: ["zoo", "zebra", "zipper", "zero"]
+    };
+
+    let currentLetter = '';
+    let currentTarget = '';
+
+    // 生成選單
+    const menu = document.getElementById('menu');
+    Object.keys(phonicsData).forEach(letter => {
+        let btn = document.createElement('button');
+        btn.innerText = letter;
+        btn.className = 'letter-btn';
+        btn.onclick = () => startLetter(letter);
+        menu.appendChild(btn);
+    });
+
+    function startLetter(letter) {
+        currentLetter = letter;
+        document.getElementById('menu').classList.add('hidden');
+        document.getElementById('title').classList.add('hidden');
+        document.getElementById('game-zone').classList.remove('hidden');
+        nextRound();
+    }
+
+    function backToMenu() {
+        document.getElementById('menu').classList.remove('hidden');
+        document.getElementById('title').classList.remove('hidden');
+        document.getElementById('game-zone').classList.add('hidden');
+    }
+
+    function nextRound() {
+        const words = phonicsData[currentLetter];
+        currentTarget = words[Math.floor(Math.random() * words.length)];
+        
+        // 隨機抓一個別的字母的字當干擾
+        const letters = Object.keys(phonicsData).filter(l => l !== currentLetter);
+        const randomLetter = letters[Math.floor(Math.random() * letters.length)];
+        const distractor = phonicsData[randomLetter][0];
+
+        const options = [currentTarget, distractor].sort(() => Math.random() - 0.5);
+        document.getElementById('opt1').innerText = options[0];
+        document.getElementById('opt2').innerText = options[1];
+        document.getElementById('opt1').style.backgroundColor = '#E3F2FD';
+        document.getElementById('opt2').style.backgroundColor = '#E3F2FD';
+
+        document.getElementById('quiz-area').classList.remove('hidden');
+        document.getElementById('big-word').style.display = 'none';
+        document.getElementById('star').style.display = 'none';
+        document.getElementById('repeat-hint').style.display = 'none';
+        document.getElementById('step-hint').innerText = "Step 1: Listen!";
+    }
+
+    function playSound() {
+        speak(currentTarget);
+    }
+
+    function speak(text) {
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'en-US';
+        msg.rate = 0.7;
+        window.speechSynthesis.speak(msg);
+    }
+
+    function checkAnswer(el) {
+        if (el.innerText === currentTarget) {
+            playDing();
+            showSuccess();
+        } else {
+            el.style.backgroundColor = '#FFCDD2';
+            speak("Try again!");
+        }
+    }
+
+    function showSuccess() {
+        document.getElementById('quiz-area').classList.add('hidden');
+        document.getElementById('step-hint').innerText = "Good Job!";
+        document.getElementById('big-word').innerText = currentTarget;
+        document.getElementById('big-word').style.display = 'block';
+        document.getElementById('star').style.display = 'block';
+        document.getElementById('repeat-hint').style.display = 'block';
+        
+        setTimeout(() => speak(currentTarget), 500);
+        setTimeout(nextRound, 3500);
+    }
+
+    function playDing() {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.connect(g); g.connect(ctx.destination);
+        osc.frequency.setValueAtTime(523, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(659, ctx.currentTime + 0.1);
+        g.gain.setValueAtTime(0.1, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+        osc.start(); osc.stop(ctx.currentTime + 0.3);
+    }
+</script>
+</body>
+</html>
