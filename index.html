@@ -1,166 +1,234 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phonics Pronunciation App</title>
+    <title>Short Vowel Hero 🌈</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
-        :root { --primary: #FF5722; --secondary: #2196F3; --success: #4CAF50; --bg: #FFF9C4; }
-        body { font-family: 'Comic Sans MS', sans-serif; text-align: center; background-color: var(--bg); padding: 20px; margin: 0; }
-        .container { background: white; max-width: 600px; margin: auto; padding: 25px; border-radius: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); min-height: 80vh; }
-        .alphabet-menu { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
-        .letter-btn { background: white; border: 2px solid var(--secondary); border-radius: 8px; padding: 10px; cursor: pointer; font-size: 18px; width: 45px; }
-        .letter-btn:hover { background: var(--secondary); color: white; }
+        :root {
+            --color-a: #FF8A80; --color-e: #81C784; --color-i: #64B5F6;
+            --color-o: #FFB74D; --color-u: #BA68C8; --color-review: #FFD700;
+        }
+        body {
+            font-family: 'Arial Rounded MT Bold', sans-serif;
+            background-color: #E0F7FA; margin: 0; padding: 10px;
+            display: flex; justify-content: center;
+        }
+        .app-container {
+            background: white; width: 100%; max-width: 500px;
+            border-radius: 40px; border: 6px solid #333;
+            padding: 20px; text-align: center; box-shadow: 0 12px 0 #B0BEC5;
+        }
         
-        #play-btn { background: var(--primary); color: white; border: none; padding: 15px 30px; font-size: 24px; border-radius: 50px; cursor: pointer; margin: 15px 0; }
-        .word-option { background: #E3F2FD; border: 3px solid #64B5F6; padding: 20px; font-size: 26px; border-radius: 15px; cursor: pointer; width: 45%; font-weight: bold; }
-        
-        #result-area { margin-top: 20px; }
-        #big-word { font-size: 70px; color: var(--success); margin: 10px 0; }
-        
-        /* 錄音按鈕樣式 */
-        .record-controls { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
-        .record-btn { background: #f44336; color: white; border: none; width: 80px; height: 80px; border-radius: 50%; font-size: 30px; cursor: pointer; }
-        .record-btn:active { background: #b71c1c; transform: scale(0.9); }
-        .play-back-btn { background: #2196F3; color: white; border: none; width: 80px; height: 80px; border-radius: 50%; font-size: 30px; cursor: pointer; }
-        .hidden { display: none !important; }
+        /* 星星獎勵區 */
+        .star-box {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #E0E0E0; /* 灰星星 */
+            letter-spacing: 5px;
+        }
+        .star-active {
+            color: #FFD700;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+        }
+
+        .tab-menu {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+            margin-bottom: 20px; background: #F5F5F5;
+            padding: 15px; border-radius: 30px; border: 3px solid #DDD;
+        }
+        .tab-btn {
+            padding: 12px; border-radius: 15px; border: none; color: white;
+            font-weight: bold; font-size: 1.2rem; cursor: pointer;
+            border-bottom: 4px solid rgba(0,0,0,0.2); transition: 0.1s;
+        }
+        .tab-btn.active { transform: scale(0.95); border-bottom: 0; }
+
+        .speaker-btn {
+            background: #FFF9C4; border: 4px solid #FBC02D;
+            border-radius: 30px; padding: 25px; cursor: pointer;
+            width: 100%; box-sizing: border-box; margin-bottom: 15px;
+        }
+        .word-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .opt-btn {
+            background: #FFF; border: 4px solid #EEE; padding: 25px;
+            border-radius: 20px; font-size: 1.8rem; font-weight: bold; cursor: pointer;
+        }
+
+        .record-panel {
+            margin-top: 20px; padding: 20px; border-radius: 25px;
+            background: #F9F9F9; border: 3px dashed #90A4AE; display: none;
+        }
+        .mic-btn {
+            background: #FF5252; color: white; border: none;
+            width: 100%; padding: 15px; border-radius: 20px; font-size: 1.3rem;
+        }
+        .hear-me-big {
+            background: #4CAF50; color: white; border: none;
+            width: 100%; padding: 25px; border-radius: 25px;
+            font-size: 2.2rem; font-weight: bold; margin-top: 15px;
+            border-bottom: 8px solid #2E7D32; display: none;
+            animation: bounce 1.2s infinite;
+        }
+        @keyframes bounce { 0%, 100% {transform: scale(1);} 50% {transform: scale(1.05);} }
+        .next-arrow { margin-top: 15px; font-size: 1.3rem; color: #555; cursor: pointer; background: #EEE; border: none; padding: 10px; border-radius: 10px; width: 100%; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div id="menu-view">
-        <h2>Choose a Letter!</h2>
-        <div id="menu" class="alphabet-menu"></div>
+<div class="app-container">
+    <div class="star-box" id="starContainer">
+        <span class="s">☆</span><span class="s">☆</span><span class="s">☆</span><span class="s">☆</span><span class="s">☆</span>
+    </div>
+    
+    <h2 id="modeTitle" style="margin: 0 0 10px 0; color: #555;">Short Vowel: A</h2>
+    
+    <div class="tab-menu">
+        <button class="tab-btn" id="btnA" style="background:var(--color-a)" onclick="switchVowel('A')">a</button>
+        <button class="tab-btn" id="btnE" style="background:var(--color-e)" onclick="switchVowel('E')">e</button>
+        <button class="tab-btn" id="btnI" style="background:var(--color-i)" onclick="switchVowel('I')">i</button>
+        <button class="tab-btn" id="btnO" style="background:var(--color-o)" onclick="switchVowel('O')">o</button>
+        <button class="tab-btn" id="btnU" style="background:var(--color-u)" onclick="switchVowel('U')">u</button>
+        <button class="tab-btn" id="btnReview" style="background:var(--color-review); color:#333;" onclick="switchVowel('Review')">⭐ ALL</button>
     </div>
 
-    <div id="game-view" class="hidden">
-        <button onclick="location.reload()" style="border:none; background:none; color:gray; cursor:pointer;">⬅ Back</button>
-        <h3 id="step-hint">Step 1: Listen!</h3>
-        <button id="play-btn" onclick="playSound()">🔊 Listen</button>
-
-        <div id="quiz-area">
-            <div style="display: flex; justify-content: space-around; margin-top: 20px;">
-                <div id="opt1" class="word-option" onclick="checkAnswer(this)"></div>
-                <div id="opt2" class="word-option" onclick="checkAnswer(this)"></div>
-            </div>
+    <div class="play-area">
+        <div class="speaker-btn" onclick="playTeacher()">
+            <span style="font-size: 50px;">👂</span>
+            <p style="font-weight:bold; color:#F57F17; margin:0;">Listen to Teacher</p>
         </div>
 
-        <div id="result-area" class="hidden">
-            <div id="star" style="font-size: 60px;">🌟 Excellent!</div>
-            <div id="big-word"></div>
-            <p>Step 3: Record & Listen</p>
-            <div class="record-controls">
-                <button id="recBtn" class="record-btn" onmousedown="startRecording()" onmouseup="stopRecording()" ontouchstart="startRecording()" ontouchend="stopRecording()">🎤</button>
-                <button id="playRecBtn" class="play-back-btn hidden" onclick="playBack()">▶️</button>
-            </div>
-            <button onclick="nextRound()" style="margin-top:30px; padding:10px 20px; border-radius:20px; border:1px solid #ccc; cursor:pointer;">Next Word ➔</button>
+        <div class="word-grid" id="optionsContainer"></div>
+        <div id="statusMsg" style="font-size: 1.5rem; font-weight: bold; margin: 15px 0;"></div>
+
+        <div class="record-panel" id="recordSection">
+            <button class="mic-btn" id="micBtn">🎤 Start Recording</button>
+            <button class="hear-me-big" id="playMeBtn">👂 HEAR ME!</button>
+            <button class="next-arrow" onclick="nextQuestion()">Next Word ➡️</button>
         </div>
     </div>
 </div>
 
 <script>
-    const phonicsData = {
-        A: ["ant", "alligator", "arrow", "apple", "ax"],
-        B: ["bee", "bear", "boy", "bike", "bus", "boat", "bird"],
-        C: ["cat", "cap", "cup", "cake", "cow", "computer", "camera", "caterpillar"],
-        D: ["dog", "door", "duck", "deer", "donkey", "dinosaur"],
-        E: ["egg", "elf", "eggplant", "elephant", "elk"],
-        F: ["fish", "fan", "five", "frog", "fox", "fruit"],
-        G: ["goat", "girl", "goose", "gift", "gum", "gorilla"],
-        H: ["hat", "horse", "hen", "house", "happy", "hand", "hippo", "hut"],
-        I: ["ink", "in", "igloo", "iguana", "insect", "indian"],
-        J: ["jam", "juice", "jeep", "jet", "jungle", "jellyfish"],
-        K: ["kite", "key", "kit", "king", "kangaroo", "koala"],
-        L: ["lion", "lamp", "leaf", "lake", "love", "line", "ladybug", "lemon"],
-        M: ["mouse", "monkey", "moon", "milk", "mitten", "map"],
-        N: ["nut", "net", "nose", "nurse", "number", "nest", "nine"],
-        O: ["ox", "olive", "on", "octopus", "otter", "ostrich"],
-        P: ["pig", "pen", "pan", "papaya", "penguin", "peas", "piano", "pizza", "puppy"],
-        Q: ["queen", "quilt", "quick", "quiet", "quarter", "quiz"],
-        R: ["run", "rock", "rabbit", "robot", "rose", "rat", "red", "room"],
-        S: ["sun", "socks", "soup", "snail", "star", "snake", "sea", "sandwich"],
-        T: ["tiger", "top", "turtle", "ten", "train", "taxi", "tomato", "tent"],
-        U: ["up", "under", "uncle", "umbrella", "underwear"],
-        V: ["vase", "van", "vet", "vest", "volcano", "violin"],
-        W: ["witch", "window", "water", "watermelon", "wolf", "watch", "well", "wagon"],
-        X: ["box", "fox", "mix", "six", "T-rex"],
-        Y: ["yolk", "yo-yo", "yes", "yawn", "yellow", "yogurt", "yarn"],
-        Z: ["zoo", "zebra", "zipper", "zero"]
+    const shortVowels = {
+        'A': ['cat', 'hat', 'bat', 'map', 'cap', 'tap', 'pan', 'fan', 'bag', 'tag', 'jam', 'ham', 'sad', 'mad'],
+        'E': ['bed', 'red', 'net', 'pet', 'wet', 'jet', 'hen', 'pen', 'ten', 'leg', 'peg', 'web'],
+        'I': ['pig', 'big', 'wig', 'bin', 'fin', 'pin', 'sit', 'hit', 'kit', 'lip', 'tip', 'zip', 'mix', 'six'],
+        'O': ['hot', 'pot', 'dot', 'box', 'fox', 'hop', 'mop', 'top', 'dog', 'log', 'job', 'rob'],
+        'U': ['sun', 'run', 'bun', 'cup', 'pup', 'bug', 'hug', 'jug', 'rug', 'tub', 'mud', 'gum', 'bus']
     };
 
-    let currentLetter = '', currentTarget = '', mediaRecorder, audioChunks = [], audioUrl;
+    let currentGroup = 'A';
+    let currentWord = '';
+    let mediaRecorder;
+    let audioChunks = [];
+    let score = 0; // 星星計數
 
-    // 初始化選單
-    const menu = document.getElementById('menu');
-    Object.keys(phonicsData).forEach(letter => {
-        let btn = document.createElement('button');
-        btn.innerText = letter; btn.className = 'letter-btn';
-        btn.onclick = () => { currentLetter = letter; document.getElementById('menu-view').classList.add('hidden'); document.getElementById('game-view').classList.remove('hidden'); nextRound(); };
-        menu.appendChild(btn);
-    });
+    // 勝利音效
+    const victorySound = new Audio('https://www.myinstants.com/media/sounds/final-fantasy-vii-victory-fanfare-1.mp3');
 
-    function nextRound() {
-        const words = phonicsData[currentLetter];
-        currentTarget = words[Math.floor(Math.random() * words.length)];
-        const letters = Object.keys(phonicsData).filter(l => l !== currentLetter);
-        const distractor = phonicsData[letters[Math.floor(Math.random() * letters.length)]][0];
-        const options = [currentTarget, distractor].sort(() => Math.random() - 0.5);
-        
-        document.getElementById('opt1').innerText = options[0];
-        document.getElementById('opt2').innerText = options[1];
-        document.getElementById('opt1').style.background = "#E3F2FD";
-        document.getElementById('opt2').style.background = "#E3F2FD";
-        document.getElementById('quiz-area').classList.remove('hidden');
-        document.getElementById('result-area').classList.add('hidden');
-        document.getElementById('playRecBtn').classList.add('hidden');
+    function switchVowel(v) {
+        currentGroup = v;
+        score = 0; // 換組時星星歸零
+        updateStars();
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('btn' + v).classList.add('active');
+        document.getElementById('modeTitle').innerText = (v === 'Review') ? "⭐ Mixed Short Vowels ⭐" : "Short Vowel: " + v;
+        nextQuestion();
     }
 
-    function playSound() { speak(currentTarget); }
-    function speak(t) { window.speechSynthesis.cancel(); const m = new SpeechSynthesisUtterance(t); m.lang = 'en-US'; m.rate = 0.7; window.speechSynthesis.speak(m); }
+    function updateStars() {
+        const stars = document.querySelectorAll('.s');
+        stars.forEach((s, i) => {
+            if(i < score) {
+                s.innerText = '★';
+                s.classList.add('star-active');
+            } else {
+                s.innerText = '☆';
+                s.classList.remove('star-active');
+            }
+        });
+    }
 
-    function checkAnswer(el) {
-        if (el.innerText === currentTarget) {
-            playDing();
-            document.getElementById('quiz-area').classList.add('hidden');
-            document.getElementById('result-area').classList.remove('hidden');
-            document.getElementById('big-word').innerText = currentTarget;
-            speak("Good job! Now record your voice.");
+    function nextQuestion() {
+        let pool = (currentGroup === 'Review') ? [].concat(...Object.values(shortVowels)) : shortVowels[currentGroup];
+        currentWord = pool[Math.floor(Math.random() * pool.length)];
+        let distract = pool[Math.floor(Math.random() * pool.length)];
+        while(distract === currentWord) distract = pool[Math.floor(Math.random() * pool.length)];
+
+        document.getElementById('recordSection').style.display = 'none';
+        document.getElementById('playMeBtn').style.display = 'none';
+        document.getElementById('statusMsg').innerText = "";
+        
+        const container = document.getElementById('optionsContainer');
+        container.innerHTML = "";
+        [currentWord, distract].sort(() => Math.random() - 0.5).forEach(w => {
+            const btn = document.createElement('button');
+            btn.className = 'opt-btn';
+            btn.innerText = w;
+            btn.onclick = () => check(w);
+            container.appendChild(btn);
+        });
+        playTeacher();
+    }
+
+    function playTeacher() {
+        const u = new SpeechSynthesisUtterance(currentWord);
+        u.lang = 'en-US'; u.rate = 0.7;
+        window.speechSynthesis.speak(u);
+    }
+
+    function check(selected) {
+        if(selected === currentWord) {
+            score++;
+            updateStars();
+            
+            if(score >= 5) {
+                victorySound.play();
+                confetti({ particleCount: 300, spread: 100, origin: { y: 0.6 } });
+                document.getElementById('statusMsg').innerText = "🏆 CHAMPION! 🏆";
+                score = 0; // 重置
+                setTimeout(updateStars, 3000);
+            } else {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.7 } });
+                document.getElementById('statusMsg').innerText = "Good Job! 🌟";
+            }
+            document.getElementById('statusMsg').style.color = "#4CAF50";
+            document.getElementById('recordSection').style.display = 'block';
         } else {
-            el.style.background = "#FFCDD2";
-            speak("Try again");
+            document.getElementById('statusMsg').innerText = "Try Again! 💪";
+            document.getElementById('statusMsg').style.color = "#FF5252";
         }
     }
 
-    // 錄音邏輯
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-        mediaRecorder = new MediaRecorder(stream);
+    // 錄音 logic
+    const micBtn = document.getElementById('micBtn');
+    const playMeBtn = document.getElementById('playMeBtn');
+    micBtn.onclick = async () => {
+        if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder.start();
+            audioChunks = [];
+            micBtn.innerText = "🛑 Stop";
+            micBtn.style.background = "#000";
+        } else {
+            mediaRecorder.stop();
+            micBtn.innerText = "🎤 Record Again";
+            micBtn.style.background = "#FF5252";
+        }
         mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
         mediaRecorder.onstop = () => {
             const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-            audioUrl = URL.createObjectURL(audioBlob);
-            document.getElementById('playRecBtn').classList.remove('hidden');
+            const audioUrl = URL.createObjectURL(audioBlob);
+            const audio = new Audio(audioUrl);
+            playMeBtn.style.display = 'block';
+            playMeBtn.onclick = () => audio.play();
         };
-    });
+    };
 
-    function startRecording() { 
-        audioChunks = []; 
-        mediaRecorder.start(); 
-        document.getElementById('recBtn').innerText = "🔴";
-    }
-    function stopRecording() { 
-        mediaRecorder.stop(); 
-        document.getElementById('recBtn').innerText = "🎤";
-    }
-    function playBack() { new Audio(audioUrl).play(); }
-
-    function playDing() {
-        const ctx = new AudioContext(); const o = ctx.createOscillator(); const g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination); o.frequency.setValueAtTime(523, ctx.currentTime);
-        o.frequency.exponentialRampToValueAtTime(659, ctx.currentTime + 0.1);
-        g.gain.setValueAtTime(0.1, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
-        o.start(); o.stop(ctx.currentTime + 0.3);
-    }
+    window.onload = () => switchVowel('A');
 </script>
 </body>
 </html>
