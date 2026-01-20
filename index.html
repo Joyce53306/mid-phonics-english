@@ -1,234 +1,314 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Short Vowel Hero 🌈</title>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>CVC Phonics Hero 🚀</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap" rel="stylesheet">
+
     <style>
-        :root {
-            --color-a: #FF8A80; --color-e: #81C784; --color-i: #64B5F6;
-            --color-o: #FFB74D; --color-u: #BA68C8; --color-review: #FFD700;
-        }
-        body {
-            font-family: 'Arial Rounded MT Bold', sans-serif;
-            background-color: #E0F7FA; margin: 0; padding: 10px;
-            display: flex; justify-content: center;
-        }
-        .app-container {
-            background: white; width: 100%; max-width: 500px;
-            border-radius: 40px; border: 6px solid #333;
-            padding: 20px; text-align: center; box-shadow: 0 12px 0 #B0BEC5;
+        :root { 
+            --pink: #f8a5c2; 
+            --blue: #778beb; 
+            --bg: #fffbe6; 
+            --gold: #feca57; 
+            --accent: #54a0ff; 
+            --green: #b2ff59; 
         }
         
-        /* 星星獎勵區 */
-        .star-box {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            color: #E0E0E0; /* 灰星星 */
-            letter-spacing: 5px;
+        * { 
+            -webkit-tap-highlight-color: transparent; 
+            -webkit-user-select: none; 
+            user-select: none; 
+            box-sizing: border-box; 
         }
-        .star-active {
-            color: #FFD700;
-            text-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+        
+        body { 
+            /* 這裡設定 Andika 字體，確保全站的 a 都是手寫體 */
+            font-family: 'Andika', sans-serif; 
+            background-color: var(--bg); 
+            text-align: center; 
+            margin: 0; 
+            padding: 10px; 
+        }
+        
+        .container { max-width: 600px; margin: auto; padding: 20px; background: white; border-radius: 40px; box-shadow: 0 15px 0 #f0e68c; min-height: 95vh; position: relative; display: flex; flex-direction: column; }
+        .header { color: var(--accent); font-size: 28px; font-weight: 700; margin-bottom: 10px; }
+        .stars { font-size: 40px; color: var(--gold); min-height: 50px; }
+        
+        /* 選單樣式 */
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
+        
+        .btn-vowel { 
+            padding: 25px 10px; 
+            background: var(--pink); 
+            color: white; 
+            border-radius: 20px; 
+            font-size: 45px; 
+            cursor: pointer; 
+            border: none; 
+            box-shadow: 0 5px #f681a2; 
+            font-family: 'Andika', sans-serif; /* 確保按鈕也是手寫體 */
+        }
+        
+        .btn-family { 
+            padding: 15px 5px; 
+            background: #e3f2fd; 
+            color: #1976D2; 
+            border-radius: 15px; 
+            font-size: 26px; 
+            cursor: pointer; 
+            border: 1px solid #bbdefb; 
+            box-shadow: 0 4px #90caf9; 
+            font-family: 'Andika', sans-serif;
+            font-weight: 700;
         }
 
-        .tab-menu {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
-            margin-bottom: 20px; background: #F5F5F5;
-            padding: 15px; border-radius: 30px; border: 3px solid #DDD;
+        /* 遊戲區域 */
+        .word-pic { font-size: 80px; margin: 20px 0; }
+        .choice-container { display: flex; justify-content: space-around; margin: 25px 0; }
+        
+        .circle-btn { 
+            width: 140px; 
+            height: 140px; 
+            border-radius: 50%; 
+            border: 8px solid white; 
+            font-size: 34px; 
+            font-weight: 700; 
+            color: white; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            box-shadow: 0 8px 0 rgba(0,0,0,0.1); 
+            font-family: 'Andika', sans-serif; /* 選項字體 */
         }
-        .tab-btn {
-            padding: 12px; border-radius: 15px; border: none; color: white;
-            font-weight: bold; font-size: 1.2rem; cursor: pointer;
-            border-bottom: 4px solid rgba(0,0,0,0.2); transition: 0.1s;
-        }
-        .tab-btn.active { transform: scale(0.95); border-bottom: 0; }
+        
+        .pink { background-color: var(--pink); }
+        .blue { background-color: #bbdefb; color: #1565c0 !important; }
 
-        .speaker-btn {
-            background: #FFF9C4; border: 4px solid #FBC02D;
-            border-radius: 30px; padding: 25px; cursor: pointer;
-            width: 100%; box-sizing: border-box; margin-bottom: 15px;
-        }
-        .word-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .opt-btn {
-            background: #FFF; border: 4px solid #EEE; padding: 25px;
-            border-radius: 20px; font-size: 1.8rem; font-weight: bold; cursor: pointer;
+        /* 錄音控制區 */
+        .rec-box { background: #fdfdfd; border: 2px solid #eee; border-radius: 30px; padding: 15px; margin-top: 15px; }
+        .rec-btn { width: 60px; height: 60px; border-radius: 50%; border: none; background: #ff5252; color: white; font-size: 24px; cursor: pointer; }
+        .play-btn { width: 100%; background: var(--green); border: none; padding: 12px; border-radius: 20px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; font-family: 'Andika', sans-serif; }
+
+        /* 回首頁按鈕 */
+        .home-btn { 
+            background: #eee; 
+            color: #666; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 20px; 
+            font-size: 18px; 
+            margin-top: auto; 
+            cursor: pointer; 
+            font-family: 'Andika', sans-serif;
+            display: inline-block;
+            align-self: center;
         }
 
-        .record-panel {
-            margin-top: 20px; padding: 20px; border-radius: 25px;
-            background: #F9F9F9; border: 3px dashed #90A4AE; display: none;
-        }
-        .mic-btn {
-            background: #FF5252; color: white; border: none;
-            width: 100%; padding: 15px; border-radius: 20px; font-size: 1.3rem;
-        }
-        .hear-me-big {
-            background: #4CAF50; color: white; border: none;
-            width: 100%; padding: 25px; border-radius: 25px;
-            font-size: 2.2rem; font-weight: bold; margin-top: 15px;
-            border-bottom: 8px solid #2E7D32; display: none;
-            animation: bounce 1.2s infinite;
-        }
-        @keyframes bounce { 0%, 100% {transform: scale(1);} 50% {transform: scale(1.05);} }
-        .next-arrow { margin-top: 15px; font-size: 1.3rem; color: #555; cursor: pointer; background: #EEE; border: none; padding: 10px; border-radius: 10px; width: 100%; }
+        .hidden { display: none !important; }
+        .victory-jump { animation: jump 0.5s ease infinite alternate; }
+        @keyframes jump { from { transform: translateY(0); } to { transform: translateY(-10px); } }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <div class="star-box" id="starContainer">
-        <span class="s">☆</span><span class="s">☆</span><span class="s">☆</span><span class="s">☆</span><span class="s">☆</span>
-    </div>
-    
-    <h2 id="modeTitle" style="margin: 0 0 10px 0; color: #555;">Short Vowel: A</h2>
-    
-    <div class="tab-menu">
-        <button class="tab-btn" id="btnA" style="background:var(--color-a)" onclick="switchVowel('A')">a</button>
-        <button class="tab-btn" id="btnE" style="background:var(--color-e)" onclick="switchVowel('E')">e</button>
-        <button class="tab-btn" id="btnI" style="background:var(--color-i)" onclick="switchVowel('I')">i</button>
-        <button class="tab-btn" id="btnO" style="background:var(--color-o)" onclick="switchVowel('O')">o</button>
-        <button class="tab-btn" id="btnU" style="background:var(--color-u)" onclick="switchVowel('U')">u</button>
-        <button class="tab-btn" id="btnReview" style="background:var(--color-review); color:#333;" onclick="switchVowel('Review')">⭐ ALL</button>
+<div class="container">
+    <div id="view-vowels">
+        <h2 class="header">CVC Phonics Hero 🚀</h2>
+        <div class="stars">✨✨✨</div>
+        <p>Pick a Sound!</p>
+        <div class="grid">
+            <button class="btn-vowel" onclick="unlockAudio(); showFamilies('a')">a</button>
+            <button class="btn-vowel" onclick="unlockAudio(); showFamilies('e')" style="background: #4db6ac; box-shadow: 0 5px #00897b;">e</button>
+            <button class="btn-vowel" onclick="unlockAudio(); showFamilies('i')" style="background: #7986cb; box-shadow: 0 5px #5c6bc0;">i</button>
+            <button class="btn-vowel" onclick="unlockAudio(); showFamilies('o')" style="background: #ffb74d; box-shadow: 0 5px #fb8c00;">o</button>
+            <button class="btn-vowel" onclick="unlockAudio(); showFamilies('u')" style="background: #ba68c8; box-shadow: 0 5px #8e24aa;">u</button>
+        </div>
     </div>
 
-    <div class="play-area">
-        <div class="speaker-btn" onclick="playTeacher()">
-            <span style="font-size: 50px;">👂</span>
-            <p style="font-weight:bold; color:#F57F17; margin:0;">Listen to Teacher</p>
+    <div id="view-families" class="hidden">
+        <h2 class="header" id="family-title">Word Families</h2>
+        <div class="grid" id="family-list"></div>
+        <button class="home-btn" onclick="goHome()" style="margin-top: 30px;">🏠 Home</button>
+    </div>
+
+    <div id="view-game" class="hidden">
+        <div class="header" id="game-title">-at Family</div>
+        <div class="stars" id="star-display">☆☆☆☆☆</div>
+        <div class="word-pic" id="word-emoji">🐱</div>
+        
+        <div id="question-area">
+            <div class="choice-container">
+                <button id="opt1" class="circle-btn pink" onclick="checkAnswer(this)"></button>
+                <button id="opt2" class="circle-btn blue" onclick="checkAnswer(this)"></button>
+            </div>
         </div>
 
-        <div class="word-grid" id="optionsContainer"></div>
-        <div id="statusMsg" style="font-size: 1.5rem; font-weight: bold; margin: 15px 0;"></div>
-
-        <div class="record-panel" id="recordSection">
-            <button class="mic-btn" id="micBtn">🎤 Start Recording</button>
-            <button class="hear-me-big" id="playMeBtn">👂 HEAR ME!</button>
-            <button class="next-arrow" onclick="nextQuestion()">Next Word ➡️</button>
+        <div id="feedback-area" class="hidden">
+            <div class="rec-box">
+                <button id="recBtn" class="rec-btn" onclick="toggleRecording()">🎤</button>
+                <p id="rec-hint" style="font-size:12px; color:gray;">點一下錄音</p>
+                <button id="playRecBtn" class="play-btn hidden" onclick="playBack()">▶️ 聽我的聲音</button>
+            </div>
+            <button class="play-btn" style="background:var(--accent); color:white; margin-top:15px;" onclick="nextRound()">NEXT ➔</button>
         </div>
+        
+        <button class="home-btn" onclick="goHome()">🏠 Home</button>
     </div>
 </div>
 
 <script>
-    const shortVowels = {
-        'A': ['cat', 'hat', 'bat', 'map', 'cap', 'tap', 'pan', 'fan', 'bag', 'tag', 'jam', 'ham', 'sad', 'mad'],
-        'E': ['bed', 'red', 'net', 'pet', 'wet', 'jet', 'hen', 'pen', 'ten', 'leg', 'peg', 'web'],
-        'I': ['pig', 'big', 'wig', 'bin', 'fin', 'pin', 'sit', 'hit', 'kit', 'lip', 'tip', 'zip', 'mix', 'six'],
-        'O': ['hot', 'pot', 'dot', 'box', 'fox', 'hop', 'mop', 'top', 'dog', 'log', 'job', 'rob'],
-        'U': ['sun', 'run', 'bun', 'cup', 'pup', 'bug', 'hug', 'jug', 'rug', 'tub', 'mud', 'gum', 'bus']
+    const victoryAudio = new Audio('https://www.myinstants.com/media/sounds/final-fantasy-vii-victory-fanfare-1.mp3');
+    victoryAudio.preload = 'auto';
+
+    function stopVictoryMusic() {
+        victoryAudio.pause();
+        victoryAudio.currentTime = 0;
+    }
+
+    function unlockAudio() {
+        victoryAudio.play().then(() => { stopVictoryMusic(); }).catch(() => {});
+    }
+
+    function goHome() {
+        stopVictoryMusic();
+        location.reload();
+    }
+
+    // CVC 單字庫
+    const cvcData = {
+        'a': {
+            'at': { emoji: '🐱', words: ['cat', 'bat', 'hat', 'mat', 'rat'] },
+            'ad': { emoji: '🧔', words: ['dad', 'sad', 'mad', 'bad', 'pad'] },
+            'an': { emoji: '🚐', words: ['van', 'pan', 'can', 'fan', 'man'] },
+            'am': { emoji: '🍞', words: ['jam', 'ham', 'ram', 'yam'] },
+            'ap': { emoji: '🗺️', words: ['map', 'cap', 'tap', 'nap'] },
+            'ag': { emoji: '🛍️', words: ['bag', 'rag', 'tag', 'wag'] }
+        },
+        'e': {
+            'et': { emoji: '🚀', words: ['jet', 'net', 'pet', 'wet', 'vet'] },
+            'en': { emoji: '🐔', words: ['hen', 'ten', 'pen', 'men', 'den'] },
+            'ed': { emoji: '🛏️', words: ['bed', 'red', 'wed', 'fed'] }
+        },
+        'i': {
+            'ig': { emoji: '🐷', words: ['pig', 'wig', 'big', 'dig', 'fig'] },
+            'in': { emoji: '🗑️', words: ['bin', 'pin', 'fin', 'win', 'tin'] },
+            'ip': { emoji: '👄', words: ['lip', 'zip', 'tip', 'hip', 'dip'] },
+            'it': { emoji: '🧘', words: ['sit', 'hit', 'kit', 'fit', 'bit'] }
+        },
+        'o': {
+            'og': { emoji: '🐶', words: ['dog', 'log', 'jog', 'hog'] },
+            'op': { emoji: '🧹', words: ['mop', 'top', 'hop', 'pop', 'cop'] },
+            'ot': { emoji: '🍲', words: ['pot', 'hot', 'dot', 'cot'] },
+            'ox': { emoji: '📦', words: ['box', 'fox'] }
+        },
+        'u': {
+            'ug': { emoji: '🐞', words: ['bug', 'hug', 'jug', 'mug', 'rug'] },
+            'un': { emoji: '☀️', words: ['sun', 'run', 'bun', 'nun'] },
+            'ut': { emoji: '🥜', words: ['nut', 'cut', 'hut'] },
+            'ub': { emoji: '🛀', words: ['tub', 'cub', 'sub', 'rub'] }
+        }
     };
 
-    let currentGroup = 'A';
-    let currentWord = '';
-    let mediaRecorder;
-    let audioChunks = [];
-    let score = 0; // 星星計數
+    let currentVowel = '', currentFamily = '', currentTarget = '', score = 0;
+    let mediaRecorder, audioChunks = [], audioUrl, isRecording = false;
 
-    // 勝利音效
-    const victorySound = new Audio('https://www.myinstants.com/media/sounds/final-fantasy-vii-victory-fanfare-1.mp3');
+    function showFamilies(v) {
+        currentVowel = v;
+        document.getElementById('view-vowels').classList.add('hidden');
+        document.getElementById('view-families').classList.remove('hidden');
+        document.getElementById('family-title').innerText = `Short ${v} Families`;
+        const list = document.getElementById('family-list');
+        list.innerHTML = '';
+        Object.keys(cvcData[v]).forEach(f => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-family'; btn.innerText = `-${f}`;
+            btn.onclick = () => startGame(f);
+            list.appendChild(btn);
+        });
+    }
 
-    function switchVowel(v) {
-        currentGroup = v;
-        score = 0; // 換組時星星歸零
+    function startGame(f) {
+        currentFamily = f; score = 0;
+        document.getElementById('view-families').classList.add('hidden');
+        document.getElementById('view-game').classList.remove('hidden');
+        nextRound();
+    }
+
+    function nextRound() {
+        stopVictoryMusic();
+        document.getElementById('question-area').classList.remove('hidden');
+        document.getElementById('feedback-area').classList.add('hidden');
+        document.getElementById('playRecBtn').classList.add('hidden');
+        document.getElementById('star-display').classList.remove('victory-jump');
+        
+        const data = cvcData[currentVowel][currentFamily];
+        currentTarget = data.words[Math.floor(Math.random() * data.words.length)];
+        document.getElementById('word-emoji').innerText = data.emoji;
+        document.getElementById('game-title').innerText = `-${currentFamily} Family`;
+
+        const distractor = "sun"; 
+        const options = [currentTarget, distractor].sort(() => Math.random() - 0.5);
+        document.getElementById('opt1').innerText = options[0];
+        document.getElementById('opt2').innerText = options[1];
         updateStars();
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById('btn' + v).classList.add('active');
-        document.getElementById('modeTitle').innerText = (v === 'Review') ? "⭐ Mixed Short Vowels ⭐" : "Short Vowel: " + v;
-        nextQuestion();
+        speak(currentTarget);
+    }
+
+    function speak(t) {
+        window.speechSynthesis.cancel();
+        const m = new SpeechSynthesisUtterance(t);
+        m.lang = 'en-US'; m.rate = 0.8;
+        window.speechSynthesis.speak(m);
+    }
+
+    function checkAnswer(el) {
+        stopVictoryMusic();
+        if (el.innerText === currentTarget) {
+            score++; updateStars();
+            document.getElementById('question-area').classList.add('hidden');
+            document.getElementById('feedback-area').classList.remove('hidden');
+            if (score > 0 && score % 5 === 0) {
+                victoryAudio.play();
+                document.getElementById('star-display').classList.add('victory-jump');
+            }
+        } else { speak("Try again"); }
     }
 
     function updateStars() {
-        const stars = document.querySelectorAll('.s');
-        stars.forEach((s, i) => {
-            if(i < score) {
-                s.innerText = '★';
-                s.classList.add('star-active');
-            } else {
-                s.innerText = '☆';
-                s.classList.remove('star-active');
-            }
-        });
+        let s = score % 5 === 0 && score !== 0 ? 5 : score % 5;
+        document.getElementById('star-display').innerText = "★".repeat(s) + "☆".repeat(5 - s);
     }
 
-    function nextQuestion() {
-        let pool = (currentGroup === 'Review') ? [].concat(...Object.values(shortVowels)) : shortVowels[currentGroup];
-        currentWord = pool[Math.floor(Math.random() * pool.length)];
-        let distract = pool[Math.floor(Math.random() * pool.length)];
-        while(distract === currentWord) distract = pool[Math.floor(Math.random() * pool.length)];
-
-        document.getElementById('recordSection').style.display = 'none';
-        document.getElementById('playMeBtn').style.display = 'none';
-        document.getElementById('statusMsg').innerText = "";
-        
-        const container = document.getElementById('optionsContainer');
-        container.innerHTML = "";
-        [currentWord, distract].sort(() => Math.random() - 0.5).forEach(w => {
-            const btn = document.createElement('button');
-            btn.className = 'opt-btn';
-            btn.innerText = w;
-            btn.onclick = () => check(w);
-            container.appendChild(btn);
-        });
-        playTeacher();
-    }
-
-    function playTeacher() {
-        const u = new SpeechSynthesisUtterance(currentWord);
-        u.lang = 'en-US'; u.rate = 0.7;
-        window.speechSynthesis.speak(u);
-    }
-
-    function check(selected) {
-        if(selected === currentWord) {
-            score++;
-            updateStars();
-            
-            if(score >= 5) {
-                victorySound.play();
-                confetti({ particleCount: 300, spread: 100, origin: { y: 0.6 } });
-                document.getElementById('statusMsg').innerText = "🏆 CHAMPION! 🏆";
-                score = 0; // 重置
-                setTimeout(updateStars, 3000);
-            } else {
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.7 } });
-                document.getElementById('statusMsg').innerText = "Good Job! 🌟";
-            }
-            document.getElementById('statusMsg').style.color = "#4CAF50";
-            document.getElementById('recordSection').style.display = 'block';
+    function toggleRecording() {
+        if (!isRecording) {
+            audioChunks = []; mediaRecorder.start(); isRecording = true;
+            document.getElementById('recBtn').innerText = "⏹️";
         } else {
-            document.getElementById('statusMsg').innerText = "Try Again! 💪";
-            document.getElementById('statusMsg').style.color = "#FF5252";
+            mediaRecorder.stop(); isRecording = false;
+            document.getElementById('recBtn').innerText = "🎤";
         }
     }
 
-    // 錄音 logic
-    const micBtn = document.getElementById('micBtn');
-    const playMeBtn = document.getElementById('playMeBtn');
-    micBtn.onclick = async () => {
-        if (!mediaRecorder || mediaRecorder.state === 'inactive') {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorder = new MediaRecorder(stream);
-            mediaRecorder.start();
-            audioChunks = [];
-            micBtn.innerText = "🛑 Stop";
-            micBtn.style.background = "#000";
-        } else {
-            mediaRecorder.stop();
-            micBtn.innerText = "🎤 Record Again";
-            micBtn.style.background = "#FF5252";
-        }
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+        mediaRecorder = new MediaRecorder(stream);
         mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
         mediaRecorder.onstop = () => {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-            const audioUrl = URL.createObjectURL(audioBlob);
-            const audio = new Audio(audioUrl);
-            playMeBtn.style.display = 'block';
-            playMeBtn.onclick = () => audio.play();
+            const blob = new Blob(audioChunks, { type: 'audio/wav' });
+            audioUrl = URL.createObjectURL(blob);
+            document.getElementById('playRecBtn').classList.remove('hidden');
         };
-    };
+    });
 
-    window.onload = () => switchVowel('A');
+    function playBack() { if(audioUrl) new Audio(audioUrl).play(); }
 </script>
 </body>
 </html>
