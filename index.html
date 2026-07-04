@@ -57,19 +57,6 @@
             font-family: 'Andika', sans-serif; 
         }
         
-        .btn-family { 
-            padding: 15px 5px; 
-            background: #e3f2fd; 
-            color: #1976D2; 
-            border-radius: 15px; 
-            font-size: 26px; 
-            cursor: pointer; 
-            border: 1px solid #bbdefb; 
-            box-shadow: 0 4px #90caf9; 
-            font-family: 'Andika', sans-serif;
-            font-weight: 700;
-        }
-
         .word-pic { font-size: 80px; margin: 20px 0; }
         .choice-container { display: flex; justify-content: space-around; margin: 25px 0; }
         
@@ -121,22 +108,16 @@
         <div class="stars">✨✨✨</div>
         <p>Pick a Sound!</p>
         <div class="grid">
-            <button class="btn-vowel" onclick="unlockAudio(); showFamilies('a')">a</button>
-            <button class="btn-vowel" onclick="unlockAudio(); showFamilies('e')" style="background: #4db6ac; box-shadow: 0 5px #00897b;">e</button>
-            <button class="btn-vowel" onclick="unlockAudio(); showFamilies('i')" style="background: #7986cb; box-shadow: 0 5px #5c6bc0;">i</button>
-            <button class="btn-vowel" onclick="unlockAudio(); showFamilies('o')" style="background: #ffb74d; box-shadow: 0 5px #fb8c00;">o</button>
-            <button class="btn-vowel" onclick="unlockAudio(); showFamilies('u')" style="background: #ba68c8; box-shadow: 0 5px #8e24aa;">u</button>
+            <button class="btn-vowel" onclick="unlockAudio(); startGame('a')">a</button>
+            <button class="btn-vowel" onclick="unlockAudio(); startGame('e')" style="background: #4db6ac; box-shadow: 0 5px #00897b;">e</button>
+            <button class="btn-vowel" onclick="unlockAudio(); startGame('i')" style="background: #7986cb; box-shadow: 0 5px #5c6bc0;">i</button>
+            <button class="btn-vowel" onclick="unlockAudio(); showFamilies('o'); startGame('o')" style="background: #ffb74d; box-shadow: 0 5px #fb8c00;">o</button>
+            <button class="btn-vowel" onclick="unlockAudio(); showFamilies('u'); startGame('u')" style="background: #ba68c8; box-shadow: 0 5px #8e24aa;">u</button>
         </div>
     </div>
 
-    <div id="view-families" class="hidden">
-        <h2 class="header" id="family-title">Word Families</h2>
-        <div class="grid" id="family-list"></div>
-        <button class="home-btn" onclick="goHome()" style="margin-top: 30px;">🏠 Home</button>
-    </div>
-
     <div id="view-game" class="hidden">
-        <div class="header" id="game-title">-at Family</div>
+        <div class="header" id="game-title">Short Vowel</div>
         <div class="stars" id="star-display">☆☆☆☆☆</div>
         <div class="word-pic" id="word-emoji">🐱</div>
         
@@ -164,75 +145,24 @@
     const victoryAudio = new Audio('https://www.myinstants.com/media/sounds/final-fantasy-vii-victory-fanfare-1.mp3');
     victoryAudio.preload = 'auto';
 
-    function stopVictoryMusic() {
-        victoryAudio.pause();
-        victoryAudio.currentTime = 0;
-    }
-
-    function unlockAudio() {
-        victoryAudio.play().then(() => { stopVictoryMusic(); }).catch(() => {});
-    }
-
-    function goHome() {
-        stopVictoryMusic();
-        location.reload();
-    }
-
     const cvcData = {
-        'a': {
-            'at': { emoji: '🐱', words: ['cat', 'bat', 'hat', 'mat', 'rat'] },
-            'ad': { emoji: '🧔', words: ['dad', 'sad', 'mad', 'bad', 'pad'] },
-            'an': { emoji: '🚐', words: ['van', 'pan', 'can', 'fan', 'man'] },
-            'am': { emoji: '🍞', words: ['jam', 'ham', 'ram', 'yam'] },
-            'ap': { emoji: '🗺️', words: ['map', 'cap', 'tap', 'nap'] },
-            'ag': { emoji: '🛍️', words: ['bag', 'rag', 'tag', 'wag'] }
-        },
-        'e': {
-            'et': { emoji: '🚀', words: ['jet', 'net', 'pet', 'wet', 'vet'] },
-            'en': { emoji: '🐔', words: ['hen', 'ten', 'pen', 'men', 'den'] },
-            'ed': { emoji: '🛏️', words: ['bed', 'red', 'wed', 'fed'] }
-        },
-        'i': {
-            'ig': { emoji: '🐷', words: ['pig', 'wig', 'big', 'dig', 'fig'] },
-            'in': { emoji: '🗑️', words: ['bin', 'pin', 'fin', 'win', 'tin'] },
-            'ip': { emoji: '👄', words: ['lip', 'zip', 'tip', 'hip', 'dip'] },
-            'it': { emoji: '🧘', words: ['sit', 'hit', 'kit', 'fit', 'bit'] }
-        },
-        'o': {
-            'og': { emoji: '🐶', words: ['dog', 'log', 'jog', 'hog'] },
-            'op': { emoji: '🧹', words: ['mop', 'top', 'hop', 'pop', 'cop'] },
-            'ot': { emoji: '🍲', words: ['pot', 'hot', 'dot', 'cot'] },
-            'ox': { emoji: '📦', words: ['box', 'fox'] }
-        },
-        'u': {
-            'ug': { emoji: '🐞', words: ['bug', 'hug', 'jug', 'mug', 'rug'] },
-            'un': { emoji: '☀️', words: ['sun', 'run', 'bun', 'nun'] },
-            'ut': { emoji: '🥜', words: ['nut', 'cut', 'hut'] },
-            'ub': { emoji: '🛀', words: ['tub', 'cub', 'sub', 'rub'] }
-        }
+        'a': { emoji: '🐱', words: ['cat', 'bat', 'hat', 'mat', 'rat', 'dad', 'sad', 'mad', 'bad', 'pad', 'van', 'pan', 'can', 'fan', 'man'] },
+        'e': { emoji: '🚀', words: ['jet', 'net', 'pet', 'wet', 'vet', 'hen', 'ten', 'pen', 'men', 'den', 'bed', 'red', 'wed', 'fed', 'jet'] },
+        'i': { emoji: '🐷', words: ['pig', 'wig', 'big', 'dig', 'fig', 'bin', 'pin', 'fin', 'win', 'tin', 'lip', 'zip', 'tip', 'hip', 'dip'] },
+        'o': { emoji: '🐶', words: ['dog', 'log', 'jog', 'hog', 'mop', 'top', 'hop', 'pop', 'cop', 'pot', 'hot', 'dot', 'cot', 'box', 'fox'] },
+        'u': { emoji: '🐞', words: ['bug', 'hug', 'jug', 'mug', 'rug', 'sun', 'run', 'bun', 'nun', 'nut', 'cut', 'hut', 'tub', 'cub', 'sub'] }
     };
 
-    let currentVowel = '', currentFamily = '', currentTarget = '', score = 0;
+    let currentVowel = '', currentTarget = '', score = 0;
     let mediaRecorder, audioChunks = [], audioUrl, isRecording = false;
 
-    function showFamilies(v) {
-        currentVowel = v;
-        document.getElementById('view-vowels').classList.add('hidden');
-        document.getElementById('view-families').classList.remove('hidden');
-        document.getElementById('family-title').innerText = `Short ${v} Families`;
-        const list = document.getElementById('family-list');
-        list.innerHTML = '';
-        Object.keys(cvcData[v]).forEach(f => {
-            const btn = document.createElement('button');
-            btn.className = 'btn-family'; btn.innerText = `-${f}`;
-            btn.onclick = () => startGame(f);
-            list.appendChild(btn);
-        });
-    }
+    function stopVictoryMusic() { victoryAudio.pause(); victoryAudio.currentTime = 0; }
+    function unlockAudio() { victoryAudio.play().then(() => { stopVictoryMusic(); }).catch(() => {}); }
+    function goHome() { stopVictoryMusic(); location.reload(); }
 
-    function startGame(f) {
-        currentFamily = f; score = 0;
-        document.getElementById('view-families').classList.add('hidden');
+    function startGame(v) {
+        currentVowel = v; score = 0;
+        document.getElementById('view-vowels').classList.add('hidden');
         document.getElementById('view-game').classList.remove('hidden');
         nextRound();
     }
@@ -244,10 +174,10 @@
         document.getElementById('playRecBtn').classList.add('hidden');
         document.getElementById('star-display').classList.remove('victory-jump');
         
-        const data = cvcData[currentVowel][currentFamily];
+        const data = cvcData[currentVowel];
         currentTarget = data.words[Math.floor(Math.random() * data.words.length)];
         document.getElementById('word-emoji').innerText = data.emoji;
-        document.getElementById('game-title').innerText = `-${currentFamily} Family`;
+        document.getElementById('game-title').innerText = `Short ${currentVowel.toUpperCase()} Group`;
 
         const distractor = "sun"; 
         const options = [currentTarget, distractor].sort(() => Math.random() - 0.5);
