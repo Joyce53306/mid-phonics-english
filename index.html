@@ -32,7 +32,6 @@
         }
         
         body { 
-            /* 這裡設定 Andika 字體，確保全站的 a 都是手寫體 */
             font-family: 'Andika', sans-serif; 
             background-color: var(--bg); 
             text-align: center; 
@@ -44,7 +43,6 @@
         .header { color: var(--accent); font-size: 28px; font-weight: 700; margin-bottom: 10px; }
         .stars { font-size: 40px; color: var(--gold); min-height: 50px; }
         
-        /* 選單樣式 */
         .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
         
         .btn-vowel { 
@@ -56,7 +54,7 @@
             cursor: pointer; 
             border: none; 
             box-shadow: 0 5px #f681a2; 
-            font-family: 'Andika', sans-serif; /* 確保按鈕也是手寫體 */
+            font-family: 'Andika', sans-serif; 
         }
         
         .btn-family { 
@@ -72,7 +70,6 @@
             font-weight: 700;
         }
 
-        /* 遊戲區域 */
         .word-pic { font-size: 80px; margin: 20px 0; }
         .choice-container { display: flex; justify-content: space-around; margin: 25px 0; }
         
@@ -87,18 +84,16 @@
             cursor: pointer; 
             transition: 0.2s; 
             box-shadow: 0 8px 0 rgba(0,0,0,0.1); 
-            font-family: 'Andika', sans-serif; /* 選項字體 */
+            font-family: 'Andika', sans-serif; 
         }
         
         .pink { background-color: var(--pink); }
         .blue { background-color: #bbdefb; color: #1565c0 !important; }
 
-        /* 錄音控制區 */
         .rec-box { background: #fdfdfd; border: 2px solid #eee; border-radius: 30px; padding: 15px; margin-top: 15px; }
         .rec-btn { width: 60px; height: 60px; border-radius: 50%; border: none; background: #ff5252; color: white; font-size: 24px; cursor: pointer; }
         .play-btn { width: 100%; background: var(--green); border: none; padding: 12px; border-radius: 20px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; font-family: 'Andika', sans-serif; }
 
-        /* 回首頁按鈕 */
         .home-btn { 
             background: #eee; 
             color: #666; 
@@ -183,7 +178,6 @@
         location.reload();
     }
 
-    // CVC 單字庫
     const cvcData = {
         'a': {
             'at': { emoji: '🐱', words: ['cat', 'bat', 'hat', 'mat', 'rat'] },
